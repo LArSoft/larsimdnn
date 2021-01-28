@@ -1,0 +1,14 @@
+// tfloader_gan_tool.fcl
+// Oct. 10 2020 Wei Mu
+BEGIN_PROLOG
+
+TFLoaderToolGAN:
+{
+    tool_type: TFLoaderGAN
+    ModelName:   "./models/graph.pb"     //to be updated
+    InputsName:  "dense_1_input"         //to be updated according to the input layer of the network
+    OutputName:  "activation_5/Sigmoid"  //to be updated according to the output layer of the network
+}
+
+
+END_PROLOG
