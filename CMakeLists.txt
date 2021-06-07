@@ -10,7 +10,7 @@
 # use cmake 3.14 or later
 cmake_minimum_required (VERSION 3.19 FATAL_ERROR)
 
-project(larsimdnn 09.01.09 LANGUAGES CXX)
+project(larsimdnn VERSION 09.01.09 LANGUAGES CXX)
 
 find_package(cetmodules REQUIRED)
 find_package(canvas_root_io)
