@@ -55,8 +55,8 @@ if(tensorflow_FOUND)
   # find tensorflow library
   find_ups_product( tensorflow )
   find_ups_product( protobuf )
-  cet_find_library(TENSORFLOW NAMES tensorflow-core PATHS ENV TENSORFLOW_LIB NO_DEFAULT_PATH )
-  cet_find_library(PROTOBUF NAMES protobuf PATHS ENV PROTOBUF_LIB NO_DEFAULT_PATH )
+  cet_find_library(TENSORFLOW NAMES tensorflow-core PATHS ENV TENSORFLOW_LIB )
+  cet_find_library(PROTOBUF NAMES protobuf PATHS ENV PROTOBUF_LIB )
 endif ()
 
 # source
