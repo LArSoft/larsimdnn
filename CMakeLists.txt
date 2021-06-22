@@ -8,14 +8,13 @@
 
 
 # use cmake 3.14 or later
-cmake_minimum_required (VERSION 3.12...3.14 FATAL_ERROR)
+cmake_minimum_required (VERSION 3.19 FATAL_ERROR)
 
-project(larsimdnn LANGUAGES CXX)
+project(larsimdnn VERSION 09.01.09 LANGUAGES CXX)
 
-# cetbuildtools contains our cmake modules
-find_package(cetbuildtools REQUIRED)
-
-list(APPEND CMAKE_MODULE_PATH $ENV{CANVAS_ROOT_IO_DIR}/Modules $ENV{ART_DIR}/Modules)
+find_package(cetmodules REQUIRED)
+find_package(canvas_root_io)
+find_package(art)
 
 include(CetCMakeEnv)
 cet_cmake_env()
@@ -42,7 +41,7 @@ find_ups_product( nug4 )
 find_ups_product( nurandom )
 find_ups_product( art )
 find_ups_product(art_root_io)
-find_ups_product( postgresql )
+find_package( postgresql )
 find_ups_product( range )
 find_ups_product( eigen )
 
@@ -51,19 +50,22 @@ include(ArtDictionary)
 include(ArtMake)
 include(BuildPlugins)
 
-if( DEFINED ENV{TENSORFLOW_DIR} )
+find_package(tensorflow)
+if(tensorflow_FOUND) 
   # find tensorflow library
-  find_ups_product( protobuf )
   find_ups_product( tensorflow )
-  cet_find_library(TENSORFLOW NAMES tensorflow-core PATHS ENV TENSORFLOW_LIB NO_DEFAULT_PATH )
-  cet_find_library(PROTOBUF NAMES protobuf PATHS ENV PROTOBUF_LIB NO_DEFAULT_PATH )
+  find_ups_product( protobuf )
+  cet_find_library(TENSORFLOW NAMES tensorflow-core PATHS ENV TENSORFLOW_LIB )
+  cet_find_library(PROTOBUF NAMES protobuf PATHS ENV PROTOBUF_LIB )
 endif ()
 
 # source
 add_subdirectory(larsimdnn)
 
 # ups - table and config files
+if(WANT_UPS)
 add_subdirectory(ups)
+endif()
 
 # packaging utility
 include(UseCPack)
