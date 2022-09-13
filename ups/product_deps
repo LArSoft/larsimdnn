@@ -249,7 +249,7 @@ fwdir	product_dir	config_data
 ####################################
 product		version		qual	flags		<table_format=2>
 larsim		v09_25_00	-
-larfinder       v01_00_00       -       only_for_build
+larfinder       v01_00_00       -
 cetmodules	v3_16_00	-	only_for_build
 tensorflow	v2_6_0		-	optional
 end_product_list
@@ -306,11 +306,11 @@ end_product_list
 #   case it is optional.
 #
 ####################################
-qualifier	larsim		tensorflow
-c7:debug	c7:debug	c7:p392
-c7:prof		c7:prof		c7:p392
-e20:debug	e20:debug	e20:p392
-e20:prof	e20:prof	e20:p392
+qualifier    larsim      tensorflow   larfinder
+c7:debug     c7:debug    c7:p392      -nq-
+c7:prof      c7:prof     c7:p392      -nq-
+e20:debug    e20:debug   e20:p392     -nq-
+e20:prof     e20:prof    e20:p392     -nq-
 end_qualifier_list
 ####################################
 

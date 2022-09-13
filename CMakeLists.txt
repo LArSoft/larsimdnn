@@ -23,7 +23,7 @@ cet_set_compiler_flags(DIAGS CAUTIOUS
 
 cet_report_compiler_flags(REPORT_THRESHOLD VERBOSE)
 
-find_package(larfinder REQUIRED)
+find_package(larfinder REQUIRED EXPORT)
 
 find_package(larsim REQUIRED EXPORT)
 find_package(larevt REQUIRED EXPORT)
