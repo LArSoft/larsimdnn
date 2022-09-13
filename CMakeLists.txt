@@ -18,7 +18,7 @@ cet_cmake_env()
 cet_set_compiler_flags(DIAGS CAUTIOUS
   WERROR
   NO_UNDEFINED
-  EXTRA_FLAGS -Wno-unused-local-typedefs
+  EXTRA_FLAGS -pedantic -Wno-unused-local-typedefs
 )
 
 cet_report_compiler_flags(REPORT_THRESHOLD VERBOSE)
@@ -33,21 +33,7 @@ find_package(lardataobj REQUIRED EXPORT)
 find_package(larcorealg REQUIRED EXPORT)
 find_package(larcoreobj REQUIRED EXPORT)
 
-find_package(nusimdata REQUIRED EXPORT)
-find_package(nurandom REQUIRED EXPORT)
-
-find_package(art_root_io REQUIRED EXPORT)
-find_package(art REQUIRED EXPORT)
-find_package(canvas REQUIRED EXPORT)
-find_package(messagefacility REQUIRED EXPORT)
-find_package(cetlib REQUIRED EXPORT)
-find_package(cetlib_except REQUIRED EXPORT)
-
-find_package(CLHEP COMPONENTS Random REQUIRED EXPORT)
-find_package(ROOT COMPONENTS Core Hist Tree REQUIRED EXPORT)
-find_package(TBB REQUIRED EXPORT)
 find_package(TensorFlow 2.6.0 QUIET EXPORT)
-find_package(Threads REQUIRED EXPORT)
 
 # macros for dictionary and simple_plugin
 include(BuildPlugins)
