@@ -308,7 +308,7 @@ end_product_list
 ####################################
 qualifier	larsim		tensorflow
 c7:debug	c7:debug	c7:p392
-c7:prof		c7:prof		c7:p392	
+c7:prof		c7:prof		c7:p392
 e20:debug	e20:debug	e20:p392
 e20:prof	e20:prof	e20:p392
 end_qualifier_list
