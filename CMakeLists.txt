@@ -7,15 +7,10 @@
 # ======================================================================
 
 
-# use cmake 3.14 or later
-cmake_minimum_required (VERSION 3.12...3.14 FATAL_ERROR)
+cmake_minimum_required(VERSION 3.20 FATAL_ERROR)
 
-project(larsimdnn LANGUAGES CXX)
-
-# cetbuildtools contains our cmake modules
-find_package(cetbuildtools REQUIRED)
-
-list(APPEND CMAKE_MODULE_PATH $ENV{CANVAS_ROOT_IO_DIR}/Modules $ENV{ART_DIR}/Modules)
+find_package(cetmodules REQUIRED)
+project(larsimdnn VERSION 09.00.00 LANGUAGES CXX)
 
 include(CetCMakeEnv)
 cet_cmake_env()
@@ -23,47 +18,45 @@ cet_cmake_env()
 cet_set_compiler_flags(DIAGS CAUTIOUS
   WERROR
   NO_UNDEFINED
-  EXTRA_FLAGS -pedantic -Wno-unused-local-typedefs
+  EXTRA_FLAGS -Wno-unused-local-typedefs
 )
 
-cet_report_compiler_flags()
+cet_report_compiler_flags(REPORT_THRESHOLD VERBOSE)
 
-# these are minimum required versions, not the actual product versions
-find_ups_product( larcoreobj )
-find_ups_product( larcorealg )
-find_ups_product( larcore )
-find_ups_product( lardataobj )
-find_ups_product( lardataalg )
-find_ups_product( lardata )
-find_ups_product( larevt )
-find_ups_product( larsim )
-find_ups_product( nutools )
-find_ups_product( nug4 )
-find_ups_product( nurandom )
-find_ups_product( art )
-find_ups_product(art_root_io)
-find_ups_product( postgresql )
-find_ups_product( range )
-find_ups_product( eigen )
+find_package(larfinder REQUIRED)
+
+find_package(larsim REQUIRED EXPORT)
+find_package(larevt REQUIRED EXPORT)
+find_package(lardata REQUIRED EXPORT)
+find_package(larcore REQUIRED EXPORT)
+find_package(lardataobj REQUIRED EXPORT)
+find_package(larcorealg REQUIRED EXPORT)
+find_package(larcoreobj REQUIRED EXPORT)
+
+find_package(nusimdata REQUIRED EXPORT)
+find_package(nurandom REQUIRED EXPORT)
+
+find_package(art_root_io REQUIRED EXPORT)
+find_package(art REQUIRED EXPORT)
+find_package(canvas REQUIRED EXPORT)
+find_package(messagefacility REQUIRED EXPORT)
+find_package(cetlib REQUIRED EXPORT)
+find_package(cetlib_except REQUIRED EXPORT)
+
+find_package(CLHEP COMPONENTS Random REQUIRED EXPORT)
+find_package(ROOT COMPONENTS Core Hist Tree REQUIRED EXPORT)
+find_package(TBB REQUIRED EXPORT)
+find_package(TensorFlow 2.6.0 QUIET EXPORT)
+find_package(Threads REQUIRED EXPORT)
 
 # macros for dictionary and simple_plugin
-include(ArtDictionary)
-include(ArtMake)
 include(BuildPlugins)
 
-if( DEFINED ENV{TENSORFLOW_DIR} )
-  # find tensorflow library
-  find_ups_product( protobuf )
-  find_ups_product( tensorflow )
-  cet_find_library(TENSORFLOW NAMES tensorflow-core PATHS ENV TENSORFLOW_LIB NO_DEFAULT_PATH )
-  cet_find_library(PROTOBUF NAMES protobuf PATHS ENV PROTOBUF_LIB NO_DEFAULT_PATH )
-endif ()
-
 # source
-add_subdirectory(larsimdnn)
+# enable when code is added
+##add_subdirectory(larsimdnn)
 
 # ups - table and config files
-add_subdirectory(ups)
 
 # packaging utility
-include(UseCPack)
+cet_cmake_config()
