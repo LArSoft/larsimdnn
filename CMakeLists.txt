@@ -23,6 +23,9 @@ cet_set_compiler_flags(DIAGS CAUTIOUS
 
 cet_report_compiler_flags(REPORT_THRESHOLD VERBOSE)
 
+# needed because we call cet_make_plugin_builder
+cet_cmake_module_directories(Modules BINARY)
+
 find_package(larfinder REQUIRED EXPORT)
 
 find_package(larsim REQUIRED EXPORT)
@@ -33,6 +36,7 @@ find_package(lardataobj REQUIRED EXPORT)
 find_package(larcorealg REQUIRED EXPORT)
 find_package(larcoreobj REQUIRED EXPORT)
 
+find_package(Eigen3 REQUIRED EXPORT)
 find_package(TensorFlow 2.6.0 QUIET EXPORT)
 
 # macros for dictionary and simple_plugin
