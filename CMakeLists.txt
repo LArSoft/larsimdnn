@@ -44,7 +44,7 @@ include(BuildPlugins)
 
 # source
 # enable when code is added
-##add_subdirectory(larsimdnn)
+add_subdirectory(larsimdnn)
 
 # ups - table and config files
 
