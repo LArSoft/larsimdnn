@@ -8,8 +8,8 @@
 #define TFLoader_H
 
 #include <memory>
-#include <vector>
 #include <string>
+#include <vector>
 
 //#include "tensorflow/core/public/session.h"
 //#include "tensorflow/core/platform/env.h"
@@ -24,22 +24,19 @@
 //    struct SavedModelBundle;
 //}
 
-namespace phot
-{
-    class TFLoader
-    {
-    public:
-        TFLoader();
-        virtual ~TFLoader() = default;
+namespace phot {
+  class TFLoader {
+  public:
+    TFLoader();
+    virtual ~TFLoader() = default;
 
-        virtual void Initialization()       = 0;
-        virtual void CloseSession()      = 0;
-        virtual void Predict(std::vector<double> pars)    = 0;
-        std::vector<double> GetPrediction() const   {return prediction;}
+    virtual void Initialization() = 0;
+    virtual void CloseSession() = 0;
+    virtual void Predict(std::vector<double> pars) = 0;
+    std::vector<double> GetPrediction() const { return prediction; }
 
-    protected:
-        std::vector<double>   prediction;
-    };
+  protected:
+    std::vector<double> prediction;
+  };
 }
 #endif
-
