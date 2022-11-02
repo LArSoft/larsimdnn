@@ -120,7 +120,7 @@ namespace phot {
     fTFGenerator->Initialization();
 
     art::ServiceHandle<geo::Geometry const> geo;
-    nOpChannels = int(geo->Cryostat(0).NOpDet());
+    nOpChannels = int(geo->Cryostat().NOpDet());
     std::cout << "Number of optical detectors: " << nOpChannels << std::endl;
 
     return;
