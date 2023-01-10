@@ -8,8 +8,11 @@
 #define TFLoaderMLP_H
 
 #include "art/Utilities/ToolMacros.h"
+#include "cetlib/search_path.h"
 #include "fhiclcpp/ParameterSet.h"
 #include "larsimdnn/PhotonPropagation/TFLoaderTools/TFLoader.h"
+
+
 
 namespace phot
 {

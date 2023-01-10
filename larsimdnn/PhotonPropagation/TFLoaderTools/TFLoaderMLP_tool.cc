@@ -25,7 +25,16 @@ namespace phot
             std::cout << "Input name error! exit!" << std::endl;
             return;
         }
-        std::cout << "Loading TF Model from: " << ModelName << ", Input Layer: ";
+        
+        std::string GraphFileWithPath;
+        cet::search_path sp("FW_SEARCH_PATH");
+        if (!sp.find_file(ModelName, GraphFileWithPath))
+        {
+            throw cet::exception("TFLoaderTool")
+            << "Unable to find computable graph in " << sp.to_string() << "\n";
+        }
+        
+        std::cout << "Loading TF Model from: " << GraphFileWithPath << ", Input Layer: ";
         for(int i = 0; i < num_input; ++ i)
         {
             std::cout << InputsName[i] << " ";
@@ -33,11 +42,11 @@ namespace phot
         std::cout << ", Output Layer: " << OutputName << "\n";
 
         //Load SavedModel
-        modelbundle    = new tensorflow::SavedModelBundleLite();
+        modelbundle = new tensorflow::SavedModelBundleLite();
 
         status = tensorflow::LoadSavedModel(tensorflow::SessionOptions(),
                                             tensorflow::RunOptions(),
-                                            ModelName,
+                                            GraphFileWithPath,
                                             {tensorflow::kSavedModelTagServe},
                                             modelbundle);
 
