@@ -7,10 +7,7 @@
 
 #include "larsimdnn/PhotonPropagation/TFLoaderTools/TFLoader.h"
 
-namespace phot
-{
-    //----------------------------------------------------------------------
-    TFLoader::TFLoader()
-    {
-    }
+namespace phot {
+  //----------------------------------------------------------------------
+  TFLoader::TFLoader() {}
 }
