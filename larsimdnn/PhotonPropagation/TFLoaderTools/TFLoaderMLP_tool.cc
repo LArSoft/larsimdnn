@@ -22,7 +22,13 @@ namespace phot {
       std::cout << "Input name error! exit!" << std::endl;
       return;
     }
-    std::cout << "Loading TF Model from: " << ModelName << ", Input Layer: ";
+    std::string GraphFileWithPath;
+    cet::search_path sp("FW_SEARCH_PATH");
+    if (!sp.find_file(ModelName, GraphFileWithPath)) {
+      std::cout << "Failed to load SavedModel in : " << sp.to_string() << "\n";
+      return;
+    }
+    std::cout << "Loading TF Model from: " << GraphFileWithPath << ", Input Layer: ";
     for (int i = 0; i < num_input; ++i) {
       std::cout << InputsName[i] << " ";
     }
@@ -33,7 +39,7 @@ namespace phot {
 
     status = tensorflow::LoadSavedModel(tensorflow::SessionOptions(),
                                         tensorflow::RunOptions(),
-                                        ModelName,
+                                        GraphFileWithPath,
                                         {tensorflow::kSavedModelTagServe},
                                         modelbundle);
 
