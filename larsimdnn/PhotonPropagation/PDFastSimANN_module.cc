@@ -91,13 +91,18 @@ namespace phot {
     , simTag{pset.get<art::InputTag>("SimulationLabel")}
     , fScintTime{art::make_tool<ScintTime>(pset.get<fhicl::ParameterSet>("ScintTimeTool"))}
     , fTFGenerator{art::make_tool<TFLoader>(pset.get<fhicl::ParameterSet>("TFLoaderTool"))}
-    , fPhotonEngine(art::ServiceHandle<rndm::NuRandomService> {}
-                      ->createEngine(*this, "HepJamesRandom", "photon", pset, "SeedPhoton"))
-    , fScintTimeEngine(art::ServiceHandle<rndm::NuRandomService>()->createEngine(*this,
-                                                                                 "HepJamesRandom",
-                                                                                 "scinttime",
-                                                                                 pset,
-                                                                                 "SeedScintTime"))
+    , fPhotonEngine(art::ServiceHandle<rndm::NuRandomService>()->registerAndSeedEngine(
+        createEngine(0, "HepJamesRandom", "photon"),
+        "HepJamesRandom",
+        "photon",
+        pset,
+        "SeedPhoton"))
+    , fScintTimeEngine(art::ServiceHandle<rndm::NuRandomService>()->registerAndSeedEngine(
+        createEngine(0, "HepJamesRandom", "scinttime"),
+        "HepJamesRandom",
+        "scinttime",
+        pset,
+        "SeedScintTime"))
   {
     std::cout << "PDFastSimANN Module Construct" << std::endl;
 
