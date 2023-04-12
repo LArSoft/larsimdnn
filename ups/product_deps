@@ -251,7 +251,7 @@ product		version		qual	flags		<table_format=2>
 larsim		v09_80_00rc0	-
 larfinder       v09_00_01       -
 cetmodules	v3_20_00	-	only_for_build
-tensorflow	v2_6_0		-	optional
+tensorflow	v2_6_4		-	optional
 end_product_list
 ####################################
 
