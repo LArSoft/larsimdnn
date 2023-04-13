@@ -13,7 +13,7 @@ find_package(cetmodules REQUIRED)
 project(larsimdnn LANGUAGES CXX)
 
 include(CetCMakeEnv)
-set(${PROJECT_NAME}_CMAKE_PROJECT_VERSION_STRING 09.80.00-rc0)
+set(${PROJECT_NAME}_CMAKE_PROJECT_VERSION_STRING 09.80.00-rc1)
 cet_cmake_env()
 
 cet_set_compiler_flags(DIAGS CAUTIOUS
