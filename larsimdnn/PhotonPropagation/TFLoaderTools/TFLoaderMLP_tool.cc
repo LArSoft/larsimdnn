@@ -22,7 +22,15 @@ namespace phot {
       std::cout << "Input name error! exit!" << std::endl;
       return;
     }
-    std::cout << "Loading TF Model from: " << ModelName << ", Input Layer: ";
+    std::string GraphFileWithPath;
+    cet::search_path sp("FW_SEARCH_PATH");
+    if (!sp.find_file(ModelName, GraphFileWithPath)) {
+      throw cet::exception("TFLoaderMLP")
+        << "In larrecodnn:phot::TFLoaderMLP: Failed to load SavedModel in : " << sp.to_string()
+        << "\n";
+    }
+    std::cout << "larrecodnn:phot::TFLoaderMLP Loading TF Model from: " << GraphFileWithPath
+              << ", Input Layer: ";
     for (int i = 0; i < num_input; ++i) {
       std::cout << InputsName[i] << " ";
     }
@@ -33,15 +41,16 @@ namespace phot {
 
     status = tensorflow::LoadSavedModel(tensorflow::SessionOptions(),
                                         tensorflow::RunOptions(),
-                                        ModelName,
+                                        GraphFileWithPath,
                                         {tensorflow::kSavedModelTagServe},
                                         modelbundle);
 
     //Initialize a tensorflow session
     //        status = tensorflow::NewSession(tensorflow::SessionOptions(), &session);
     if (!status.ok()) {
-      std::cout << "Failed to load SavedModel, status: " << status.ToString() << std::endl;
-      return;
+      throw cet::exception("TFLoaderMLP")
+        << "In larrecodnn:phot::TFLoaderMLP: Failed to load SavedModel, status: "
+        << status.ToString() << std::endl;
     }
 
     //Read in the protobuf graph
