@@ -87,7 +87,7 @@
 #>  define_pythonpath
 ####################################
 parent		larsimdnn
-defaultqual	e20
+defaultqual	e26
 ####################################
 
 ####################################
@@ -248,7 +248,7 @@ fwdir	product_dir	config_data
 #
 ####################################
 product		version		qual	flags		<table_format=2>
-larsim		v09_38_03	-
+larsim		v09_38_04	-
 larfinder       v09_00_01       -
 cetmodules	v3_20_00	-	only_for_build
 tensorflow	v2_6_4		-	optional
@@ -309,12 +309,8 @@ end_product_list
 qualifier    larsim      tensorflow   larfinder
 c14:debug    c14:debug   c14:p3913     -nq-
 c14:prof     c14:prof    c14:p3913     -nq-
-c7:debug     c7:debug    c7:p3913      -nq-
-c7:prof      c7:prof     c7:p3913      -nq-
 e26:debug    e26:debug   e26:p3913     -nq-
 e26:prof     e26:prof    e26:p3913     -nq-
-e20:debug    e20:debug   e20:p3913     -nq-
-e20:prof     e20:prof    e20:p3913     -nq-
 end_qualifier_list
 ####################################
 
