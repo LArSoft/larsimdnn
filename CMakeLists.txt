@@ -10,7 +10,7 @@
 cmake_minimum_required(VERSION 3.20 FATAL_ERROR)
 
 find_package(cetmodules REQUIRED)
-project(larsimdnn VERSION 09.06.09 LANGUAGES CXX)
+project(larsimdnn VERSION 09.06.10 LANGUAGES CXX)
 
 include(CetCMakeEnv)
 cet_cmake_env()
