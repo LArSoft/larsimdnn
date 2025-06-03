@@ -19,9 +19,31 @@ if (TensorFlow_FOUND)
     CLHEP::Random
   )
 
+  cet_build_plugin(PDFastSimANNFD1 art::EDProducer
+    LIBRARIES PRIVATE
+    TensorFlow::cc
+    TensorFlow::framework
+    larsim::PhotonPropagation
+    larcore::ServiceUtil
+    larcorealg::Geometry
+    larcoreobj::geo_vectors
+    lardataobj::Simulation
+    nurandom::RandomUtils_NuRandomService_service
+    art::Framework_Principal
+    art_plugin_support::toolMaker
+    canvas::canvas
+    messagefacility::MF_MessageLogger
+    fhiclcpp::types
+    fhiclcpp::fhiclcpp
+    cetlib_except::cetlib_except
+    CLHEP::Random
+  )
+
   add_subdirectory(TFLoaderTools)
 endif()
 
 install_headers()
 install_source()
+
+
 
