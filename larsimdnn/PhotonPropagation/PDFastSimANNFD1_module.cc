@@ -188,17 +188,15 @@ namespace phot {
       int nphot_fast = edepi.NumFPhotons();
       int nphot_slow = edepi.NumSPhotons();
 
-
-      
       //To expand responses to Full space, 20250514---
       std::vector<double> pars = {pos[0], pos[1], pos[2]};
       std::vector<double> Visibilities;
-      
+
       if (pos[0] > 364 && pos[0] < 726) {
-          // Case 1: 364 < pos[0] < 726
-          fTFGenerator->Predict(pars);
-          Visibilities = fTFGenerator->GetPrediction();
-          Visibilities.insert(Visibilities.end(), 4000, 0.0);
+        // Case 1: 364 < pos[0] < 726
+        fTFGenerator->Predict(pars);
+        Visibilities = fTFGenerator->GetPrediction();
+        Visibilities.insert(Visibilities.end(), 4000, 0.0);
       }
 
       else if (pos[0] > -364 && pos[0] < 364) {
@@ -225,22 +223,19 @@ namespace phot {
       }
 
       else if (pos[0] > -726 && pos[0] < -364) {
-          // Case 3: -726 < pos[0] < -364
-          pars[0] = std::abs(pos[0]);
-          fTFGenerator->Predict(pars);
-          Visibilities = fTFGenerator->GetPrediction();
-          Visibilities.insert(Visibilities.begin(), 4000, 0.0);
+        // Case 3: -726 < pos[0] < -364
+        pars[0] = std::abs(pos[0]);
+        fTFGenerator->Predict(pars);
+        Visibilities = fTFGenerator->GetPrediction();
+        Visibilities.insert(Visibilities.begin(), 4000, 0.0);
       }
       else {
-          // Optional: Handle invalid pos[0] case (outside [-726, 726])
-          Visibilities = std::vector<double>(6000, 0.0);
+        // Optional: Handle invalid pos[0] case (outside [-726, 726])
+        Visibilities = std::vector<double>(6000, 0.0);
       }
-      
-//      std::cout<<"\nSingle vertex prediction: "<<std::endl;
-//      std::cout<<"Adding 4000 zeros successfully!!!===========\n"<<std::endl;
 
-
-
+      //      std::cout<<"\nSingle vertex prediction: "<<std::endl;
+      //      std::cout<<"Adding 4000 zeros successfully!!!===========\n"<<std::endl;
 
       if (int(Visibilities.size()) != nOpChannels) {
         std::cout << "PDFastSimANNFD1 get channels from graph " << Visibilities.size()
@@ -329,8 +324,8 @@ namespace phot {
 
   //......................................................................
   void PDFastSimANNFD1::AddOpDetBTR(std::vector<sim::OpDetBacktrackerRecord>& opbtr,
-                                 std::map<int, int>& ChannelMap,
-                                 sim::OpDetBacktrackerRecord btr)
+                                    std::map<int, int>& ChannelMap,
+                                    sim::OpDetBacktrackerRecord btr)
   {
     int iChan = btr.OpDetNum();
     std::map<int, int>::iterator channelPosition = ChannelMap.find(iChan);
