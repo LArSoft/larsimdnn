@@ -53,23 +53,6 @@ namespace phot {
         << status.ToString() << std::endl;
     }
 
-    //Read in the protobuf graph
-    //        tensorflow::GraphDef graph_def;
-    //        status = tensorflow::ReadBinaryProto(tensorflow::Env::Default(), ModelName, &graph_def);
-    //        if (!status.ok())
-    //        {
-    //            std::cout << status.ToString() << std::endl;
-    //            return;
-    //        }
-    //
-    //        //Add the graph to the session
-    //        status = session->Create(graph_def);
-    //        if (!status.ok())
-    //        {
-    //            std::cout << status.ToString() << std::endl;
-    //            return;
-    //        }
-
     std::cout << "TF SavedModel loaded successfully." << std::endl;
     return;
   }
@@ -134,6 +117,79 @@ namespace phot {
     }
     //std::cout << std::endl;
     return;
+  }
+
+  //New batch prediction function---
+  std::vector<std::vector<double>> TFLoaderMLP::PredictBatch(
+    const std::vector<std::array<double, 3>>& positions)
+  {
+    int batch_size = positions.size();
+    if (batch_size == 0) {
+      std::cout << "TFLoaderMLP::PredictBatch: Empty input positions!" << std::endl;
+      return {};
+    }
+
+    // Define input tensors with shape (batch_size, 1)
+    tensorflow::Tensor pos_x(tensorflow::DT_FLOAT, tensorflow::TensorShape({batch_size, 1}));
+    tensorflow::Tensor pos_y(tensorflow::DT_FLOAT, tensorflow::TensorShape({batch_size, 1}));
+    tensorflow::Tensor pos_z(tensorflow::DT_FLOAT, tensorflow::TensorShape({batch_size, 1}));
+
+    auto dst_x = pos_x.flat<float>().data();
+    auto dst_y = pos_y.flat<float>().data();
+    auto dst_z = pos_z.flat<float>().data();
+
+    // Fill input tensors
+    for (int i = 0; i < batch_size; ++i) {
+      dst_x[i] = static_cast<float>(positions[i][0]);
+      dst_y[i] = static_cast<float>(positions[i][1]);
+      dst_z[i] = static_cast<float>(positions[i][2]);
+    }
+
+    // Prepare input pair list
+    std::vector<std::pair<std::string, tensorflow::Tensor>> inputs = {
+      {InputsName[0], pos_x}, {InputsName[1], pos_y}, {InputsName[2], pos_z}};
+
+    // Outputs
+    std::vector<tensorflow::Tensor> outputs;
+
+    // Run TensorFlow session
+    status = modelbundle->GetSession()->Run(inputs, {OutputName}, {}, &outputs);
+    if (!status.ok()) {
+      std::cerr << "TFLoaderMLP::PredictBatch Error: " << status.ToString() << std::endl;
+      return {};
+    }
+
+    // Parse output
+    const tensorflow::Tensor& output_tensor = outputs[0];
+
+    // Check output shape: should be (batch_size, num_channels)
+    if (output_tensor.dims() != 2) {
+      std::cerr << "TFLoaderMLP::PredictBatch Error: Output tensor has wrong shape." << std::endl;
+      return {};
+    }
+
+    int output_batch_size = output_tensor.dim_size(0);
+    int num_channels = output_tensor.dim_size(1);
+
+    if (output_batch_size != batch_size) {
+      std::cerr << "TFLoaderMLP::PredictBatch Error: Output batch size mismatch." << std::endl;
+      return {};
+    }
+
+    // Prepare the output vector
+    std::vector<std::vector<double>> predictions;
+    predictions.resize(batch_size);
+
+    auto output_data = output_tensor.flat<float>().data();
+
+    for (int i = 0; i < batch_size; ++i) {
+      predictions[i].reserve(num_channels);
+      for (int j = 0; j < num_channels; ++j) {
+        predictions[i].push_back(static_cast<double>(output_data[i * num_channels + j]));
+      }
+    }
+
+    return predictions;
   }
 }
 DEFINE_ART_CLASS_TOOL(phot::TFLoaderMLP)
