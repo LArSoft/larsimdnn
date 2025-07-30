@@ -212,9 +212,7 @@ namespace phot {
       for (int channel = 0; channel < nOpChannels; ++channel) {
         auto visibleFraction = Visibilities[channel] * vis_scale;
 
-        if (visibleFraction == 0.0) {
-          continue;
-        }
+        if (visibleFraction == 0.0) { continue; }
 
         if (fUseLitePhotons) {
           sim::OpDetBacktrackerRecord tmpbtr(channel);
