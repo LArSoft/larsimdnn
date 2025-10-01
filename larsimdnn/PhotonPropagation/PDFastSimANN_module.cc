@@ -172,45 +172,54 @@ namespace phot {
     art::ServiceHandle<geo::Geometry> geom;
     auto const& edeps = edepHandle;
 
-    int num_points = 0;
-    float vis_scale = 1.0; // to scale the visibility fraction, for test only;
+    int num_points = edeps->size();
+    float vis_scale = 1.0;
+
+    // Prepare input positions for batch inference
+    std::vector<std::array<double, 3>> positions;
+    positions.reserve(num_points);
+
     for (auto const& edepi : *edeps) {
-      num_points++;
-      int trackID = edepi.TrackID();
-      int nphot = edepi.NumPhotons();
-      double edeposit = edepi.Energy() / nphot;
-      double pos[3] = {edepi.MidPointX(), edepi.MidPointY(), edepi.MidPointZ()};
+      positions.push_back({edepi.MidPointX(), edepi.MidPointY(), edepi.MidPointZ()});
+    }
 
-      int nphot_fast = edepi.NumFPhotons();
-      int nphot_slow = edepi.NumSPhotons();
+    // Run batch prediction
+    auto VisibilityBatch = fTFGenerator->PredictBatch(positions);
 
-      std::vector<double> pars;
-      pars.push_back(pos[0]);
-      pars.push_back(pos[1]);
-      pars.push_back(pos[2]);
-      fTFGenerator->Predict(pars);
-      std::vector<double> Visibilities = fTFGenerator->GetPrediction();
+    if (VisibilityBatch.size() != size_t(num_points)) {
+      std::cout << "PDFastSimANN: Visibility batch size mismatch." << std::endl;
+      return;
+    }
+
+    // Loop over energy deposits
+    for (size_t idx = 0; idx < edeps->size(); ++idx) {
+      auto const& edepi = edeps->at(idx);
+      auto const& Visibilities = VisibilityBatch[idx];
+
       if (int(Visibilities.size()) != nOpChannels) {
         std::cout << "PDFastSimANN get channels from graph " << Visibilities.size()
                   << " is not the same as from geometry: " << nOpChannels << std::endl;
-        break;
+        continue;
       }
 
-      for (int channel = 0; channel < int(Visibilities.size()); ++channel) {
-        auto visibleFraction =
-          Visibilities[channel] * vis_scale; // to scale the visibility fraction;
+      int trackID = edepi.TrackID();
+      int nphot_fast = edepi.NumFPhotons();
+      int nphot_slow = edepi.NumSPhotons();
+      double edeposit = edepi.Energy() / edepi.NumPhotons();
 
-        if (visibleFraction == 0.0) {
-          continue; //vertex is not visible at this optical channel.
-        }
+      double pos[3] = {edepi.MidPointX(), edepi.MidPointY(), edepi.MidPointZ()};
+
+      for (int channel = 0; channel < nOpChannels; ++channel) {
+        auto visibleFraction = Visibilities[channel] * vis_scale;
+
+        if (visibleFraction == 0.0) { continue; }
 
         if (fUseLitePhotons) {
           sim::OpDetBacktrackerRecord tmpbtr(channel);
+
           if (nphot_fast > 0) {
-            //random number, poisson distribution, mean: the amount of photons visible at this channel
             auto n = static_cast<int>(randpoisphot.fire(nphot_fast * visibleFraction));
             for (long i = 0; i < n; ++i) {
-              //calculates the time at which the photon was produced
               fScintTime->GenScintTime(true, fScintTimeEngine);
               auto time = static_cast<int>(edepi.StartT() + fScintTime->GetScintTime());
               ++photonLiteCollection[channel].DetectedPhotons[time];
@@ -237,30 +246,28 @@ namespace phot {
           photon.Energy = 9.7e-6;
 
           if (nphot_fast > 0) {
-            //random number, poisson distribution, mean: the amount of photons visible at this channel
             auto n = static_cast<int>(randpoisphot.fire(nphot_fast * visibleFraction));
             if (n > 0) {
               fScintTime->GenScintTime(true, fScintTimeEngine);
               auto time = static_cast<int>(edepi.StartT() + fScintTime->GetScintTime());
               photon.Time = time;
-              // add n copies of sim::OnePhoton photon to the photon collection for a given OpChannel
               photonCollection[channel].insert(photonCollection[channel].end(), n, photon);
             }
           }
+
           if ((nphot_slow > 0) && fDoSlowComponent) {
-            //random number, poisson distribution, mean: the amount of photons visible at this channel
             auto n = static_cast<int>(randpoisphot.fire(nphot_slow * visibleFraction));
             if (n > 0) {
               fScintTime->GenScintTime(false, fScintTimeEngine);
               auto time = static_cast<int>(edepi.StartT() + fScintTime->GetScintTime());
               photon.Time = time;
-              // add n copies of sim::OnePhoton photon to the photon collection for a given OpChannel
               photonCollection[channel].insert(photonCollection[channel].end(), n, photon);
             }
           }
         }
       }
     }
+
     std::cout << "PDFastSimANN module produced " << num_points << " images..." << std::endl;
     PDChannelToSOCMap.clear();
 
