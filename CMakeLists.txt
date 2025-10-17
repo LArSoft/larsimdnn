@@ -29,8 +29,6 @@ cet_cmake_module_directories(Modules BINARY)
 find_package(larfinder REQUIRED EXPORT)
 
 find_package(larsim REQUIRED EXPORT)
-find_package(larevt REQUIRED EXPORT)
-find_package(lardata REQUIRED EXPORT)
 find_package(larcore REQUIRED EXPORT)
 find_package(lardataobj REQUIRED EXPORT)
 find_package(larcorealg REQUIRED EXPORT)
