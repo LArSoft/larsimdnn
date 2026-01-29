@@ -114,7 +114,7 @@ namespace phot {
     : art::EDProducer{pset}
     , fDoSlowComponent(pset.get<bool>("DoSlowComponent", true))
     , fUseLitePhotons(art::ServiceHandle<sim::LArG4Parameters const>()->UseLitePhotons())
-    , fBatchSize(pset.get<size_t>("BatchSize", 50000))  // KEPT: Batch size optimization
+    , fBatchSize(pset.get<size_t>("BatchSize", 50000))  // Batch size optimization
     , simTag{pset.get<art::InputTag>("SimulationLabel")}
     , fScintTime{art::make_tool<ScintTime>(pset.get<fhicl::ParameterSet>("ScintTimeTool"))}
     , fTFGenerator{art::make_tool<TFLoader>(pset.get<fhicl::ParameterSet>("TFLoaderTool"))}

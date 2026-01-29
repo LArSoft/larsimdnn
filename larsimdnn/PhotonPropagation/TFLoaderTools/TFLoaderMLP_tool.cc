@@ -17,60 +17,54 @@ namespace phot {
   //......................................................................
   void TFLoaderMLP::Initialization()
   {
-    std::cout << "DEBUG:  TFLoaderMLP::Initialization() called" << std::endl;  
-    
     int num_input = int(InputsName.size());
     if (num_input != 3) {
       std::cout << "Input name error! exit!" << std::endl;
       return;
     }
 
-     std::cout << "DEBUG: Looking for model: " << ModelName << std::endl;
-     
     std::string GraphFileWithPath;
     cet::search_path sp("FW_SEARCH_PATH");
     if (!sp.find_file(ModelName, GraphFileWithPath)) {
-      std::cout << "DEBUG:  MODEL FILE NOT FOUND!" << std::endl;  
       throw cet::exception("TFLoaderMLP")
         << "In larrecodnn:phot::TFLoaderMLP: Failed to load SavedModel in : " << sp.to_string()
         << "\n";
     }
+
     std::cout << "larrecodnn:phot::TFLoaderMLP Loading TF Model from: " << GraphFileWithPath
               << ", Input Layer: ";
     for (int i = 0; i < num_input; ++i) {
       std::cout << InputsName[i] << " ";
     }
-    std::cout << ", Output Layer: " << OutputName << "\n";
 
+    std::cout << ", Output Layer: " << OutputName << "\n";
     //Load SavedModel
     modelbundle = new tensorflow::SavedModelBundleLite();
-
+    
     status = tensorflow::LoadSavedModel(tensorflow::SessionOptions(),
                                         tensorflow::RunOptions(),
                                         GraphFileWithPath,
                                         {tensorflow::kSavedModelTagServe},
                                         modelbundle);
 
-    //Initialize a tensorflow session
-    //        status = tensorflow::NewSession(tensorflow::SessionOptions(), &session);
     if (!status.ok()) {
       throw cet::exception("TFLoaderMLP")
         << "In larrecodnn:phot::TFLoaderMLP: Failed to load SavedModel, status: "
         << status.ToString() << std::endl;
     }
-
+    
     std::cout << "TF SavedModel loaded successfully." << std::endl;
     return;
   }
-
+  
   //......................................................................
   void TFLoaderMLP::CloseSession()
   {
     if (status.ok()) {
       std::cout << "Close TF session." << std::endl;
     }
-
-    // ADDED: Clear cached tensors before deleting session
+    
+    // Clear cached tensors before deleting session
     // This ensures tensor memory is released before session shutdown
     cached_batch_size = 0;
     cached_pos_x = tensorflow::Tensor();
@@ -84,7 +78,6 @@ namespace phot {
   //......................................................................
   void TFLoaderMLP::Predict(std::vector<double> pars)
   {
-    // std::cout << "TFLoader MLP:: Predicting... " << std::endl;
     // Single point prediction (not used in batch processing) 
     int num_input = int(pars.size());
     if (num_input != 3) {
@@ -115,7 +108,7 @@ namespace phot {
     
     //Run the session
     status = modelbundle->GetSession()->Run(inputs, {OutputName}, {}, &outputs);
-    //        status = session->Run(inputs, {OutputName}, {}, &outputs);
+   
     if (!status.ok()) {
       std::cout << status.ToString() << std::endl;
       return;
@@ -123,35 +116,25 @@ namespace phot {
     
     //Grab the outputs
     unsigned int pdr = outputs[0].shape().dim_size(1);
-    //std::cout << "TFLoader MLP::Num of optical channels: " << pdr << std::endl;
-    
+   
     for (unsigned int i = 0; i < pdr; i++) {
       double value = outputs[0].flat<float>()(i);
-      //std::cout << value << ", ";
       prediction.push_back(value);
     }
-    //std::cout << std::endl;
     return;
   }
-
+  
   // New batch prediction function--- With tensor caching optimization
   std::vector<std::vector<double>> TFLoaderMLP::PredictBatch(
-    const std::vector<std::array<double, 3>>& positions)
+							     const std::vector<std::array<double, 3>>& positions)
   {
     int batch_size = positions.size();
     if (batch_size == 0) {
       std::cout << "TFLoaderMLP::PredictBatch: Empty input positions!" << std::endl;
       return {};
     }
-
-    // REMOVED: Old code that created new tensors every call
-    // Define input tensors with shape (batch_size, 1)
-    // tensorflow::Tensor pos_x(tensorflow::DT_FLOAT, tensorflow::TensorShape({batch_size, 1}));
-    // tensorflow::Tensor pos_y(tensorflow::DT_FLOAT, tensorflow::TensorShape({batch_size, 1}));
-    // tensorflow::Tensor pos_z(tensorflow::DT_FLOAT, tensorflow::TensorShape({batch_size, 1}));
-
-
-    // ADDED: Reuse cached tensors, only reallocate if batch size changed
+    
+    // Reuse cached tensors, only reallocate if batch size changed
     // This prevents TensorFlow from accumulating tensor memory across events
     // Most batches are 50k deposits, so this rarely reallocates after first batch
     if (batch_size != cached_batch_size) {
@@ -165,7 +148,7 @@ namespace phot {
       std::cout << "TFLoaderMLP: Allocated tensors for batch size " << batch_size << std::endl;
     }
 
-    // MODIFIED: Use cached tensors instead of local tensors
+    // Use cached tensors instead of local tensors
     auto dst_x = cached_pos_x.flat<float>().data();
     auto dst_y = cached_pos_y.flat<float>().data();
     auto dst_z = cached_pos_z.flat<float>().data();
@@ -177,7 +160,7 @@ namespace phot {
       dst_z[i] = static_cast<float>(positions[i][2]);
     }
     
-    // MODIFIED: Use cached tensors in inputs
+    // Use cached tensors in inputs
     // Prepare for inputs
     std::vector<std::pair<std::string, tensorflow::Tensor>> inputs = {
       {InputsName[0], cached_pos_x},   // Changed from pos_x
@@ -203,7 +186,7 @@ namespace phot {
       std::cerr << "TFLoaderMLP::PredictBatch Error: Output tensor has wrong shape." << std::endl;
       return {};
     }
-
+    
     int output_batch_size = output_tensor.dim_size(0);
     int num_channels = output_tensor.dim_size(1);
 

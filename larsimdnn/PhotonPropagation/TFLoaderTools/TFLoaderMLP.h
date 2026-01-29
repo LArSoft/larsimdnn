@@ -43,9 +43,9 @@ namespace phot {
 
     tensorflow::SavedModelBundleLite* modelbundle;
 
-    tensorflow::Status status; // ✔️ Fully correct
+    tensorflow::Status status; 
 
-    // ADDED: Cached tensors to avoid repeated allocation/deallocation
+    // Cached tensors to avoid repeated allocation/deallocation
     // These tensors are reused across all batches to prevent TensorFlow
     // from accumulating memory. Each event processes ~50 batches, so without
     // this optimization, for example, TF would cache approximately 150+ tensor allocations after 3 events.
