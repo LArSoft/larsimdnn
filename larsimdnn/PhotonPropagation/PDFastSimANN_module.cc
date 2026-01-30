@@ -74,7 +74,7 @@ namespace phot {
   private:
     const bool fDoSlowComponent;
     const bool fUseLitePhotons;
-    const size_t fBatchSize;  // KEPT: Configurable batch size for processing
+    const size_t fBatchSize; // KEPT: Configurable batch size for processing
     art::InputTag simTag;
     std::unique_ptr<ScintTime> fScintTime; //Tool to retrive timinig of scintillation
     std::unique_ptr<TFLoader>
@@ -84,18 +84,17 @@ namespace phot {
     std::map<int, int> PDChannelToSOCMap; //Where each OpChan is.
     int nOpChannels;                      //Number of optical detector
 
-
     // Method matching PDFastSimPAR optimization
     // This method uses OBTRHelper map pattern and batches photon additions
     void SimpleAddOpDetBTR(
-      std::map<int, sim::OBTRHelper>& opbtr_helper,  // Map instead of vector for O(1) access
+      std::map<int, sim::OBTRHelper>& opbtr_helper, // Map instead of vector for O(1) access
       std::map<int, int>& ChannelMap,
       size_t channel,
       int trackID,
       int time,
       double pos[3],
       double edeposit,
-      int num_photons = 1);  // Support adding multiple photons at once
+      int num_photons = 1); // Support adding multiple photons at once
 
     // Process a batch of energy deposits (Memory Optimization)
     void ProcessEnergyDepositBatch(
@@ -104,7 +103,7 @@ namespace phot {
       size_t end_idx,
       std::vector<sim::SimPhotons>& photonCollection,
       std::vector<sim::SimPhotonsLite>& photonLiteCollection,
-      std::map<int, sim::OBTRHelper>& opbtr_helper,  // from vector to map
+      std::map<int, sim::OBTRHelper>& opbtr_helper, // from vector to map
       CLHEP::RandPoissonQ& randpoisphot,
       float vis_scale);
   };
@@ -114,7 +113,7 @@ namespace phot {
     : art::EDProducer{pset}
     , fDoSlowComponent(pset.get<bool>("DoSlowComponent", true))
     , fUseLitePhotons(art::ServiceHandle<sim::LArG4Parameters const>()->UseLitePhotons())
-    , fBatchSize(pset.get<size_t>("BatchSize", 50000))  // Batch size optimization
+    , fBatchSize(pset.get<size_t>("BatchSize", 50000)) // Batch size optimization
     , simTag{pset.get<art::InputTag>("SimulationLabel")}
     , fScintTime{art::make_tool<ScintTime>(pset.get<fhicl::ParameterSet>("ScintTimeTool"))}
     , fTFGenerator{art::make_tool<TFLoader>(pset.get<fhicl::ParameterSet>("TFLoaderTool"))}
@@ -131,7 +130,8 @@ namespace phot {
         pset,
         "SeedScintTime"))
   {
-    std::cout << "PDFastSimANN Module Construct (with batch processing + OBTRHelper optimization, batch size = "
+    std::cout << "PDFastSimANN Module Construct (with batch processing + OBTRHelper optimization, "
+                 "batch size = "
               << fBatchSize << ")" << std::endl;
 
     if (fUseLitePhotons) {
@@ -167,18 +167,18 @@ namespace phot {
 
     return;
   }
-  
+
   //......................................................................
   void PDFastSimANN::produce(art::Event& event)
   {
     std::cout << "PDFastSimANN Module Producer..." << std::endl;
-    
+
     CLHEP::RandPoissonQ randpoisphot{fPhotonEngine};
 
     std::unique_ptr<std::vector<sim::SimPhotons>> phot(new std::vector<sim::SimPhotons>);
     std::unique_ptr<std::vector<sim::SimPhotonsLite>> phlit(new std::vector<sim::SimPhotonsLite>);
     std::unique_ptr<std::vector<sim::OpDetBacktrackerRecord>> opbtr(
-								    new std::vector<sim::OpDetBacktrackerRecord>);
+      new std::vector<sim::OpDetBacktrackerRecord>);
 
     auto& photonCollection(*phot);
     auto& photonLiteCollection(*phlit);
@@ -208,12 +208,12 @@ namespace phot {
     int num_points = edeps->size();
     float vis_scale = 1.0;
 
-    std::cout << "Processing " << num_points << " energy deposits in batches of "
-              << fBatchSize << std::endl;
+    std::cout << "Processing " << num_points << " energy deposits in batches of " << fBatchSize
+              << std::endl;
 
     // OBTRHelper map for efficient backtracker record construction
     std::map<int, sim::OBTRHelper> opbtr_helper;
-    
+
     // Initialize PDChannelToSOCMap with -1 for all channels
     PDChannelToSOCMap.clear();
     for (int i = 0; i < nOpChannels; i++) {
@@ -223,9 +223,9 @@ namespace phot {
     // Process in batches
     for (size_t batch_start = 0; batch_start < edeps->size(); batch_start += fBatchSize) {
       size_t batch_end = std::min(batch_start + fBatchSize, edeps->size());
-      
-      std::cout << "Processing batch " << (batch_start / fBatchSize + 1)
-                << " (deposits " << batch_start << " to " << batch_end << ")" << std::endl;
+
+      std::cout << "Processing batch " << (batch_start / fBatchSize + 1) << " (deposits "
+                << batch_start << " to " << batch_end << ")" << std::endl;
 
       ProcessEnergyDepositBatch(*edeps,
                                 batch_start,
@@ -238,7 +238,7 @@ namespace phot {
     }
 
     std::cout << "PDFastSimANN module produced " << num_points << " images..." << std::endl;
-    
+
     // Convert helper map to final vector only at the end
     if (fUseLitePhotons) {
       for (auto& iopbtr : opbtr_helper) {
@@ -268,12 +268,12 @@ namespace phot {
     size_t end_idx,
     std::vector<sim::SimPhotons>& photonCollection,
     std::vector<sim::SimPhotonsLite>& photonLiteCollection,
-    std::map<int, sim::OBTRHelper>& opbtr_helper,  // map instead of vector
+    std::map<int, sim::OBTRHelper>& opbtr_helper, // map instead of vector
     CLHEP::RandPoissonQ& randpoisphot,
     float vis_scale)
   {
     size_t batch_size = end_idx - start_idx;
-    
+
     // Prepare input positions for this batch only
     std::vector<std::array<double, 3>> positions;
     positions.reserve(batch_size);
@@ -315,7 +315,7 @@ namespace phot {
         if (visibleFraction == 0.0) { continue; }
 
         if (fUseLitePhotons) {
-	  // New optimized pattern - batch photons by time
+          // New optimized pattern - batch photons by time
           // This reduces O(millions) of function calls to O(thousands)
           std::map<int, int> temp_photon_times_fast;
           std::map<int, int> temp_photon_times_slow;
@@ -327,7 +327,7 @@ namespace phot {
               fScintTime->GenScintTime(true, fScintTimeEngine);
               auto time = static_cast<int>(edepi.StartT() + fScintTime->GetScintTime());
               ++photonLiteCollection[channel].DetectedPhotons[time];
-              ++temp_photon_times_fast[time];  // Batch by time
+              ++temp_photon_times_fast[time]; // Batch by time
             }
           }
 
@@ -338,7 +338,7 @@ namespace phot {
               fScintTime->GenScintTime(false, fScintTimeEngine);
               auto time = static_cast<int>(edepi.StartT() + fScintTime->GetScintTime());
               ++photonLiteCollection[channel].DetectedPhotons[time];
-              ++temp_photon_times_slow[time];  // Batch by time
+              ++temp_photon_times_slow[time]; // Batch by time
             }
           }
 
@@ -346,13 +346,13 @@ namespace phot {
           // Instead of adding photons one-by-one, we add all photons at each time together
           // This is the key optimization that reduces function calls dramatically
           for (auto const& [time, nphotons] : temp_photon_times_fast) {
-            SimpleAddOpDetBTR(opbtr_helper, PDChannelToSOCMap, channel, 
-                            trackID, time, pos, edeposit, nphotons);
+            SimpleAddOpDetBTR(
+              opbtr_helper, PDChannelToSOCMap, channel, trackID, time, pos, edeposit, nphotons);
           }
-          
+
           for (auto const& [time, nphotons] : temp_photon_times_slow) {
-            SimpleAddOpDetBTR(opbtr_helper, PDChannelToSOCMap, channel, 
-                            trackID, time, pos, edeposit, nphotons);
+            SimpleAddOpDetBTR(
+              opbtr_helper, PDChannelToSOCMap, channel, trackID, time, pos, edeposit, nphotons);
           }
         }
         else {
@@ -393,15 +393,14 @@ namespace phot {
   // 1. Uses map instead of vector for O(1) access by channel
   // 2. Uses OBTRHelper which has optimized internal map operations
   // 3. Supports adding multiple photons at once (num_photons parameter)
-  void PDFastSimANN::SimpleAddOpDetBTR(
-				       std::map<int, sim::OBTRHelper>& opbtr_helper,
-				       std::map<int, int>& ChannelMap,
-				       size_t channel,
-				       int trackID,
-				       int time,
-				       double pos[3],
-				       double edeposit,
-				       int num_photons)
+  void PDFastSimANN::SimpleAddOpDetBTR(std::map<int, sim::OBTRHelper>& opbtr_helper,
+                                       std::map<int, int>& ChannelMap,
+                                       size_t channel,
+                                       int trackID,
+                                       int time,
+                                       double pos[3],
+                                       double edeposit,
+                                       int num_photons)
   {
     // Check if this is the first time we're seeing this channel
     if (opbtr_helper.find(channel) == opbtr_helper.end()) {
@@ -409,14 +408,14 @@ namespace phot {
       ChannelMap[channel] = opbtr_helper.size();
       opbtr_helper.emplace(channel, channel);
     }
-    
+
     // Add photons directly to the helper's internal map
     // This is much faster than the old method which required:
     // 1. Creating a temporary OpDetBacktrackerRecord
     // 2. Adding photons one-by-one to the temp record
     // 3. Merging the temp record into the main collection
     opbtr_helper.at(channel).AddScintillationPhotonsToMap(
-							  trackID, time, num_photons, pos, edeposit);
+      trackID, time, num_photons, pos, edeposit);
   }
 
 } // namespace

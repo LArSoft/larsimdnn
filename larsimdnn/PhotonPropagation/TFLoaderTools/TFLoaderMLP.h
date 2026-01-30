@@ -43,7 +43,7 @@ namespace phot {
 
     tensorflow::SavedModelBundleLite* modelbundle;
 
-    tensorflow::Status status; 
+    tensorflow::Status status;
 
     // Cached tensors to avoid repeated allocation/deallocation
     // These tensors are reused across all batches to prevent TensorFlow
@@ -52,7 +52,7 @@ namespace phot {
     tensorflow::Tensor cached_pos_x;
     tensorflow::Tensor cached_pos_y;
     tensorflow::Tensor cached_pos_z;
-    int cached_batch_size = 0;  // Track current tensor size
+    int cached_batch_size = 0; // Track current tensor size
   };
 }
 #endif
