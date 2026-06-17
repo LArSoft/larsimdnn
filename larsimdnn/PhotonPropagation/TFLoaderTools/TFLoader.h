@@ -16,7 +16,6 @@
 #include "tensorflow/cc/saved_model/constants.h"
 #include "tensorflow/cc/saved_model/loader.h"
 
-
 namespace phot {
 
   class TFLoader {

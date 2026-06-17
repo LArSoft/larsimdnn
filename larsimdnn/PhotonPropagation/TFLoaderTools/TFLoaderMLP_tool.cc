@@ -41,11 +41,8 @@ namespace phot {
     //Load SavedModel
     modelbundle = new tensorflow::SavedModelBundleLite();
 
-    status = tensorflow::LoadSavedModel(tensorflow::SessionOptions(),
-                                        tensorflow::RunOptions(),
-                                        GraphFileWithPath,
-                                        {},
-                                        modelbundle);
+    status = tensorflow::LoadSavedModel(
+      tensorflow::SessionOptions(), tensorflow::RunOptions(), GraphFileWithPath, {}, modelbundle);
 
     if (!status.ok()) {
       throw cet::exception("TFLoaderMLP")
