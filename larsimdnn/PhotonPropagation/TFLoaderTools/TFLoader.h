@@ -12,7 +12,6 @@
 #include <string>
 #include <vector>
 
-#include "tensorflow/cc/saved_model/bundle_v2.h"
 #include "tensorflow/cc/saved_model/constants.h"
 #include "tensorflow/cc/saved_model/loader.h"
 
