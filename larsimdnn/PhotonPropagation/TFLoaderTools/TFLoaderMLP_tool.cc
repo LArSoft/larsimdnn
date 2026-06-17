@@ -44,7 +44,7 @@ namespace phot {
     status = tensorflow::LoadSavedModel(tensorflow::SessionOptions(),
                                         tensorflow::RunOptions(),
                                         GraphFileWithPath,
-                                        {tensorflow::kSavedModelTagServe},
+                                        {},
                                         modelbundle);
 
     if (!status.ok()) {

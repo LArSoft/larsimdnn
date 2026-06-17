@@ -18,7 +18,12 @@ if (TensorFlow_FOUND)
     cetlib_except::cetlib_except
     CLHEP::Random
   )
-
+  if (CMAKE_CXX_COMPILER_ID STREQUAL "GNU" AND
+      CMAKE_CXX_COMPILER_VERSION VERSION_GREATER_EQUAL "12.5")
+    # GCC 12.5 (and above) aggressively/spuriously warns about array-bounds issues.
+    target_compile_options(larsimdnn_PhotonPropagation_PDFastSimANN_module
+                         PRIVATE "-Wno-error=sign-compare")
+  endif()
   add_subdirectory(TFLoaderTools)
 endif()
 

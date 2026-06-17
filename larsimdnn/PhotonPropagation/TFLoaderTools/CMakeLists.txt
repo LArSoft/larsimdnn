@@ -16,6 +16,15 @@ cet_build_plugin(TFLoaderMLP lar::TFLoaderTool
   TensorFlow::framework
 )
 
+  if (CMAKE_CXX_COMPILER_ID STREQUAL "GNU" AND
+      CMAKE_CXX_COMPILER_VERSION VERSION_GREATER_EQUAL "12.5")
+    # GCC 12.5 (and above) aggressively/spuriously warns about array-bounds issues.
+    target_compile_options(TFLoaderTool
+                         PRIVATE "-Wno-error=sign-compare;")
+    target_compile_options(larsimdnn_PhotonPropagation_TFLoaderTools_TFLoaderMLP_tool
+                         PRIVATE "-Wno-error=sign-compare;")
+  endif()
+
 install_headers()
 install_fhicl()
 install_source()
