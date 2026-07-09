@@ -248,7 +248,7 @@ fwdir	product_dir	config_data
 #
 ####################################
 product		version		qual	flags		<table_format=2>
-larsim		v10_20_04	-
+larsim		v10_20_05	-
 larfinder       v09_00_06       -
 tensorflow	v2_15_0		-	optional
 cetmodules	v3_27_04	-	only_for_build
