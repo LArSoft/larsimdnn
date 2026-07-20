@@ -35,6 +35,7 @@ find_package(larcorealg REQUIRED EXPORT)
 find_package(larcoreobj REQUIRED EXPORT)
 
 find_package(Eigen3 REQUIRED EXPORT)
+find_package(Protobuf QUIET EXPORT)
 find_package(TensorFlow 2.6.0 QUIET EXPORT)
 
 # macros for dictionary and simple_plugin
